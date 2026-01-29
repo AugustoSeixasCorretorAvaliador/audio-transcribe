@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configurações - WhatsApp Audio Transcriber</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f6f6f6;
+        color: #222;
+        margin: 0;
+        padding: 24px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 520px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      input[type='text'] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      button {
+        margin-top: 14px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #0a7cff;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .warn {
+        margin-top: 14px;
+        background: #fff5e5;
+        color: #8a5b00;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ffd699;
+        font-size: 13px;
+      }
+      .status {
+        margin-top: 8px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>Configurar OpenAI API key</h2>
+      <p>Para transcrever os áudios, a chave é armazenada somente na sua máquina via chrome.storage.</p>
+      <label for="apiKey">API Key (começa com sk-)</label>
+      <input id="apiKey" type="text" placeholder="sk-..." />
+      <button id="saveBtn">Salvar</button>
+      <div class="status" id="status"></div>
+      <div class="warn">
+        Atenção: armazenar a chave no cliente tem riscos. O ideal é usar um backend próprio. Não compartilhe sua chave. [Ver boas práticas](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)
+      </div>
+    </div>
+    <script src="options.js"></script>
+  </body>
+</html>

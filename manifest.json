@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "WhatsApp Audio Transcriber",
+  "description": "Adiciona um botão para transcrever o último áudio recebido no WhatsApp Web usando OpenAI.",
+  "version": "0.1.0",
+  "permissions": ["storage", "scripting", "downloads"],
+  "host_permissions": ["https://web.whatsapp.com/*", "https://*.whatsapp.com/*", "https://*.whatsapp.net/*", "<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html"
+}
