@@ -329,28 +329,44 @@ function ensureButtonInjected() {
   wrapper.style.justifyContent = 'center';
   wrapper.style.gap = '2px';
   wrapper.style.userSelect = 'none';
-  wrapper.style.minWidth = '72px';
-  wrapper.style.height = '52px';
+  wrapper.style.minWidth = '48px';
+  wrapper.style.height = '38px';
   wrapper.style.lineHeight = '1.2';
+  wrapper.style.position = 'relative';
+  wrapper.style.marginLeft = '18px';
+  wrapper.style.marginRight = '0';
+  wrapper.style.marginTop = '12px';
+  wrapper.style.transform = 'translateY(6px)';
+  wrapper.style.flexShrink = '0';
+  wrapper.style.opacity = '0.65';
+
+  const iconRow = document.createElement('span');
+  iconRow.style.display = 'inline-flex';
+  iconRow.style.alignItems = 'center';
+  iconRow.style.justifyContent = 'center';
+  iconRow.style.gap = '4px';
 
   const icon = document.createElement('span');
   icon.textContent = '🎧';
-  icon.style.fontSize = '18px';
+  icon.style.fontSize = '16px';
 
   const spinner = document.createElement('span');
   spinner.textContent = '⏳';
   spinner.style.display = 'none';
-  spinner.style.fontSize = '16px';
+  spinner.style.fontSize = '14px';
+  spinner.style.marginLeft = '2px';
   spinner.id = `${BUTTON_ID}-spinner`;
 
   const label = document.createElement('span');
   label.textContent = 'Transcrever';
   label.id = `${BUTTON_ID}-label`;
-  label.style.fontSize = '11px';
+  label.style.fontSize = '10px';
   label.style.fontWeight = '700';
 
-  wrapper.appendChild(icon);
-  wrapper.appendChild(spinner);
+  iconRow.appendChild(icon);
+  iconRow.appendChild(spinner);
+
+  wrapper.appendChild(iconRow);
   wrapper.appendChild(label);
   wrapper.addEventListener('click', onTranscribeClick);
 
@@ -366,14 +382,15 @@ function ensureButtonInjected() {
     footer.style.position = 'relative';
   }
   if (footer) {
-    wrapper.style.position = 'absolute';
-    wrapper.style.right = '14px';
-    wrapper.style.bottom = '64px';
+    wrapper.style.position = 'relative';
+    wrapper.style.right = '0';
+    wrapper.style.bottom = '-6px';
+    wrapper.style.alignSelf = 'center';
     footer.appendChild(wrapper);
   } else {
     wrapper.style.position = 'fixed';
     wrapper.style.right = '16px';
-    wrapper.style.bottom = '80px';
+    wrapper.style.bottom = '16px';
     document.body.appendChild(wrapper);
   }
   log('Botão injetado (fallback).');
@@ -385,7 +402,7 @@ function setBusy(isBusy) {
   const spinner = document.getElementById(`${BUTTON_ID}-spinner`);
   const label = document.getElementById(`${BUTTON_ID}-label`);
   if (!btn || !spinner || !label) return;
-  btn.style.opacity = isBusy ? '0.65' : '1';
+  btn.style.opacity = '0.65';
   btn.style.pointerEvents = isBusy ? 'none' : 'auto';
   spinner.style.display = isBusy ? 'inline' : 'none';
   label.textContent = isBusy ? 'Transcrevendo…' : 'Transcrever';
