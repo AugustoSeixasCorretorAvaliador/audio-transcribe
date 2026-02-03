@@ -355,7 +355,7 @@ function ensureButtonInjected() {
   wrapper.style.marginLeft = '6px';
   wrapper.style.marginRight = '6px';
   wrapper.style.marginTop = '12px';
-  wrapper.style.transform = 'translate(-1cm, 6px)';
+  wrapper.style.transform = 'translate(-1cm, 3px)';
   wrapper.style.flexShrink = '0';
   wrapper.style.opacity = '0.65';
 
