@@ -7,6 +7,8 @@
 const PREFIX = '[HERO-AUDIO]';
 const BUTTON_ID = 'hero-audio-transcribe-btn';
 const TOAST_ID = 'hero-audio-toast';
+const Z_DEFAULT = 2147483645; // stays above most UI (other extensions)
+const Z_BELOW_MODAL = 10; // drops behind WhatsApp modals when they appear
 const STATE = { isTranscribing: false, lastChatTitle: null };
 let lastInjectCheck = 0;
 const MAX_SHADOW_SCAN = 3000;
@@ -304,6 +306,23 @@ function findMicButton() {
   return null;
 }
 
+function isWhatsAppModalOpen() {
+  // Heuristics: WA modals often use role="dialog" or data-animate-modal-body=true with high z-index overlays.
+  const selectors = ["[role='dialog']", "[data-animate-modal-body='true']", "div[aria-label*='Excluir']"];
+  return selectors.some((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+  });
+}
+
+function updateButtonZIndex() {
+  const btn = document.getElementById(BUTTON_ID);
+  if (!btn) return;
+  btn.style.zIndex = isWhatsAppModalOpen() ? `${Z_BELOW_MODAL}` : `${Z_DEFAULT}`;
+}
+
 function ensureButtonInjected() {
   const composer = findComposerInput();
   if (!composer) return;
@@ -313,7 +332,7 @@ function ensureButtonInjected() {
   wrapper.id = BUTTON_ID;
   wrapper.type = 'button';
   wrapper.title = 'Transcrever último áudio recebido';
-  wrapper.style.padding = '6px 8px';
+  wrapper.style.padding = '6px 6px';
   wrapper.style.borderRadius = '10px';
   wrapper.style.border = '1px solid rgba(255,255,255,0.12)';
   wrapper.style.background = '#111';
@@ -321,7 +340,7 @@ function ensureButtonInjected() {
   wrapper.style.fontSize = '12px';
   wrapper.style.fontWeight = '700';
   wrapper.style.cursor = 'pointer';
-  wrapper.style.zIndex = '2147483645';
+  wrapper.style.zIndex = `${Z_DEFAULT}`;
   wrapper.style.boxShadow = '0 6px 16px rgba(0,0,0,0.35)';
   wrapper.style.display = 'inline-flex';
   wrapper.style.flexDirection = 'column';
@@ -329,12 +348,12 @@ function ensureButtonInjected() {
   wrapper.style.justifyContent = 'center';
   wrapper.style.gap = '2px';
   wrapper.style.userSelect = 'none';
-  wrapper.style.minWidth = '48px';
+  wrapper.style.minWidth = '44px';
   wrapper.style.height = '38px';
   wrapper.style.lineHeight = '1.2';
   wrapper.style.position = 'relative';
-  wrapper.style.marginLeft = '18px';
-  wrapper.style.marginRight = '0';
+  wrapper.style.marginLeft = '6px';
+  wrapper.style.marginRight = '6px';
   wrapper.style.marginTop = '12px';
   wrapper.style.transform = 'translateY(6px)';
   wrapper.style.flexShrink = '0';
@@ -360,7 +379,7 @@ function ensureButtonInjected() {
   const label = document.createElement('span');
   label.textContent = 'Transcrever';
   label.id = `${BUTTON_ID}-label`;
-  label.style.fontSize = '10px';
+  label.style.fontSize = '9px';
   label.style.fontWeight = '700';
 
   iconRow.appendChild(icon);
@@ -369,6 +388,20 @@ function ensureButtonInjected() {
   wrapper.appendChild(iconRow);
   wrapper.appendChild(label);
   wrapper.addEventListener('click', onTranscribeClick);
+  updateButtonZIndex();
+
+  // Tenta posicionar ao lado direito do botão central já existente no footer.
+  const footer = composer.closest('footer') || document.querySelector('footer');
+  if (footer) {
+    const orderedButtons = Array.from(footer.querySelectorAll('button')).filter((b) => b?.offsetParent !== null);
+    if (orderedButtons.length >= 3) {
+      const centerIdx = Math.floor((orderedButtons.length - 1) / 2);
+      const centerBtn = orderedButtons[centerIdx];
+      centerBtn.insertAdjacentElement('afterend', wrapper);
+      log('Botão injetado ao lado do botão central.');
+      return;
+    }
+  }
 
   const mic = findMicButton();
   if (mic && mic.parentElement) {
@@ -377,7 +410,6 @@ function ensureButtonInjected() {
     return;
   }
 
-  const footer = composer.closest('footer') || document.querySelector('footer');
   if (footer && getComputedStyle(footer).position === 'static') {
     footer.style.position = 'relative';
   }
@@ -749,6 +781,7 @@ const observer = new MutationObserver(() => {
   if (now - lastInjectCheck < 500) return;
   lastInjectCheck = now;
   ensureButtonInjected();
+  updateButtonZIndex();
 });
 observer.observe(document.documentElement, { childList: true, subtree: true });
 

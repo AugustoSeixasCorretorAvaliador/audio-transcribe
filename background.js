@@ -75,22 +75,6 @@ async function fetchArrayBufferWithTimeout(url, timeoutMs) {
   }
 }
 
-async function fetchLocalFileBuffer(filePath, timeoutMs) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const safePath = filePath.replace(/\\/g, '/');
-    const url = safePath.startsWith('file:///') ? safePath : `file:///${safePath}`;
-    const resp = await fetch(url, { signal: controller.signal });
-    if (!resp.ok) throw new Error(`Falha ao abrir arquivo local (${resp.status})`);
-    const contentType = resp.headers.get('content-type') || undefined;
-    const buffer = await resp.arrayBuffer();
-    return { buffer, contentType };
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 async function handleTranscription(message) {
   try {
     const apiKey = await getApiKey();
@@ -111,14 +95,8 @@ async function handleTranscription(message) {
         audioBytes = new Uint8Array(buffer);
         if (contentType) mimeType = contentType;
       } catch (err) {
-        if (message.filePath) {
-          log('Fetch remoto falhou, tentando arquivo local');
-          const { buffer, contentType } = await fetchLocalFileBuffer(message.filePath, REQUEST_TIMEOUT_MS);
-          audioBytes = new Uint8Array(buffer);
-          if (contentType) mimeType = contentType;
-        } else {
-          throw err;
-        }
+        log('Fetch remoto falhou', err?.message || err);
+        throw err;
       }
     } else {
       return { ok: false, error: 'Payload de áudio ausente.' };
